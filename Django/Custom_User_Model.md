@@ -47,20 +47,73 @@
     INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
     ```
 
-  - 설정을 바꿔준 뒤 다시 서버를 구동시켜 보았더니?
+  - 설정을 바꿔준 뒤 다시 서버를 구동시켜 보았더니 다음과 같은 오류가 발생.
 
     ```
     ValueError: Dependency on app with no migrations: users
     ```
 
-    이런 오류가 뜬다!
-
-  - ```powershell
+  - 오류에 대한 해결 방법은 다음과 같다.
+  
+    ```powershell
     python manage.py makemigrations
     # 위 코드를 실행하면, 변경된 users앱의 migrations폴더에 0001_initial.py라는 User model 파일이 생성되어있다.
     
     python manage.py migrate
     ```
+    
+  - User Model 에 대한 Customize
+  
+    ```python
+    class User(AbstractUser):
+    
+        """ Custom User Model """
+    
+        GENDER_MALE = "male"
+        GENDER_FEMALE = "female"
+        GENDER_OTHER = "other"
+    
+        GENDER_CHOICES = (
+            (GENDER_MALE, "Male"),
+            (GENDER_FEMALE, "Female"),
+            (GENDER_OTHER, "Other"),
+        )
+    
+        LANGUAGE_ENGLISH = "en"
+        LANGUAGE_KOREAN = "kr"
+    
+        LANGUAGE_CHOICES = (
+            (LANGUAGE_ENGLISH, "English"),
+            (LANGUAGE_KOREAN, "Korean"),
+        )
+    
+        CURRENCY_USD = "usd"
+        CURRENCY_KRW = "krw"
+    
+        CURRENCY_CHOICES = (
+            (CURRENCY_USD, "USD"),
+            (CURRENCY_KRW, "KRW"),
+        )
+    
+        avatar = models.ImageField(null=True, blank=True)
+        gender = models.CharField(
+            choices=GENDER_CHOICES, max_length=10, null=True, blank=True
+        )
+        bio = models.TextField(default="", blank=True)
+        birthdate = models.DateField(null=True, blank=True)
+        language = models.CharField(
+            choices=LANGUAGE_CHOICES, max_length=10, null=True, blank=True
+        )
+        currency = models.CharField(
+            choices=CURRENCY_CHOICES, max_length=10, null=True, blank=True
+        )
+        superhost = models.BooleanField(default=False)
+    ```
+  
+    - avatar, gender, bio, birthdate.. 등등 사용자 프로필에 필요할 것 같은 다양한 필드들을 추가함.
+    - 각각의 데이터 속성에 맞는 Field들을 설정해주었다! 이에 대한 정보는 Django Docs에 널림!
+      : https://docs.djangoproject.com/ko/3.0/
+    - Field 함수에 들어가는 인자들에 대한 설명은 잘 찾아보면 될 것 같다.
 
 > #### Creating Model field
 
