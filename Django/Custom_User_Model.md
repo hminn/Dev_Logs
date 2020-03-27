@@ -137,3 +137,58 @@ python manage.py migrate
 
 ※ 장고에서 변경한 사항이 데이터베이스에 직접 영향을 주지 않는 경우에는 migrate할 필요가 없다. 예를 들어, 'gender field를 입력받는 form에 대한 변경' 등은 DB에 영향을 주는 부분이 아니기때문에 웹페이지를 새로고침하면 바로 반영이 되는 것을 볼 수 있다.
 ```
+
+
+
+> **Admin Panel**
+
+- 위에서 작업한 Custom User Model은 admin panel에서 볼 수 있다.
+
+- 이는 admin.py에서 작업을 해줘야 함.
+
+- admin.py에서 user model을 가져오려면 Regiter라는 작업을 해줘야 한다.
+
+  ```python
+  @admin.register(models.User)
+  class CustomUserAdmin(UserAdmin):
+  
+      """ Custom User Admin """
+  
+      fieldsets = UserAdmin.fieldsets + (
+          (
+              "Custom profile",
+              {
+                  "fields": (
+                      "avatar",
+                      "gender",
+                      "bio",
+                      "birthdate",
+                      "language",
+                      "currency",
+                      "superhost",
+                  )
+              },
+          ),
+      )
+  ```
+
+  - register를 하는 방법은 2가지이며, register를 하려면 class가 필요하다.
+
+    ```python
+    # 위 코드는 그 중 한가지 방법으로 짜여진 것.
+    
+    @admin.register(models.User) # 이 부분은 Decorator라고 한다.
+    class CustomUserAdmin(UserAdmin):
+        
+    # CustomUserAdmin이라는 class는 models.User를 조정할 수 있다.
+    # 작동 방식은 다음과 같다.
+    # class 위에 decorator를 써주면 class의 위치를 알고 그걸 읽어내려간다.
+    # decorator가 CustomUserAdmin class 위에 있으니까
+    # models.User를 Customer Use에 적용하려 한다는 것을 알게된다.
+    
+    # register를 하는 또 다른 방법은 다음과 같다.
+    admin.site.register(models.User, CustomUserAdmin)
+    ```
+
+    
+
