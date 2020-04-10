@@ -14,159 +14,212 @@
 
 ---
 
-## > URL
+## > Making the Form
 
-### 0. [URL 기본문법](https://wikidocs.net/9649)
+### 1. 
 
-### 1. [URL namespaces](https://docs.djangoproject.com/en/3.0/topics/http/urls/#url-namespaces)
+### 2. [getlist](https://docs.djangoproject.com/en/3.0/ref/request-response/#django.http.QueryDict.getlist)
 
-### 2. [Removing hardcoded URLs in templates](https://docs.djangoproject.com/ko/3.0/intro/tutorial03/#removing-hardcoded-urls-in-templates)
 
-- 수 많은 템플릿에 존재하는 링크에 대한 하드코딩은 매우 번거로운 일.
-- 수정사항이 있을 때마다 일일이 다 들어가서 바꿔줘야 하는 불상사가 발생할 수 있다.
-
-### 3. Django url Tag process
-
-- ``{% url %}` template 태그를 사용하여 url 설정에 정의된 특정한 URL 경로들의 의존성을 제거할 수 있다.
-
-- **Example**
-
-  ```django
-  <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
-  ```
-
-  > 이것이 `polls.urls` 모듈에 서술된 URL 의 정의를 탐색하는 식으로 동작한다. 다음과 같이 'detail' 이라는 이름의 URL 이 어떻게 정의되어 있는지 확인할 수 있다.
-
-  ```python
-  ...
-  # the 'name' value as called by the {% url %} template tag
-  path('<int:question_id>/', views.detail, name='detail'),
-  ...
-  ```
-
-  > 만약 상세 뷰의 URL을 `polls/specifics/12/`로 바꾸고 싶다면, 템플릿에서 바꾸는 것이 아니라 `polls/urls.py`에서 바꿔야 한다.
-
-  ```python
-  ...
-  # added the word 'specifics'
-  path('specifics/<int:question_id>/', views.detail, name='detail'),
-  ...
-  ```
-
-  > Django 프로젝트는 앱이 몇개라도 올 수 있다. Django는 이 여러 앱들의 URL을 어떻게 구별해낼까? 정답은 URLconf에 이름공간(namespace)을 추가하는 것이다.
-
-  ```python
-  #polls/urls.py¶
-  
-  from django.urls import path
-  from . import views
-  
-  app_name = 'polls'
-  urlpatterns = [
-      path('', views.index, name='index'),
-      path('<int:question_id>/', views.detail, name='detail'),
-      path('<int:question_id>/results/', views.results, name='results'),
-      path('<int:question_id>/vote/', views.vote, name='vote'),
-  ]
-  ```
-
-  ```django
-  #polls/templates/polls/index.html
-  
-  <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
-  ```
-
-### 4. [Reverse](https://docs.djangoproject.com/en/3.0/topics/http/urls/#reversing-namespaced-urls)
-
-- URL Pattern Name을 인자로 넘겨주면 해당 URL을 반환한다.
-- 자세한 예시와 쓰임새는 Docs를 참고하도록 하자.
 
 ---
 
-## > DetailViews : Function Based Views
+## > Searching Like a Boss
 
-### 0. Example Code
+### 1. [Field Lookup](https://docs.djangoproject.com/en/3.0/ref/models/querysets/#field-lookups) : Conditional Filtering
 
-**[rooms/views.py]**
+- 
 
-```python
-from django.views.generic import ListView, DetailView
-from django.http import Http404
-from django.shortcuts import render
-from django.utils import timezone
-from . import models
 
-class HomeView(ListView):
-    """ HomeView Definition """
-
-    model = models.Room
-    page_kwarg = "page"
-    paginate_by = 10
-    paginate_orphans = 5
-    ordering = "created"
-    context_object_name = "rooms"
-
-def room_detail(request, pk):
-    try:
-        room = models.Room.objects.get(pk=pk)
-        return render(request, "rooms/detail.html", {"room": room})
-    except models.Room.DoesNotExist:
-        raise Http404()
-```
-
-**[rooms/urls.py]**
 
 ```python
-from django.urls import path
-from . import views
+def search(request):
+    city = request.GET.get("city", "Anywhere")
+    city = str.capitalize(city)
+    country = request.GET.get("country", "KR")
+    room_type = int(request.GET.get("room_type", 0))
+    price = int(request.GET.get("price", 0))
+    guests = int(request.GET.get("guests", 0))
+    bedrooms = int(request.GET.get("bedrooms", 0))
+    beds = int(request.GET.get("beds", 0))
+    baths = int(request.GET.get("baths", 0))
+    instant = bool(request.GET.get("instant", False))
+    superhost = bool(request.GET.get("superhost", False))
+    room_types = models.RoomType.objects.all()
+    amenities = models.Amenity.objects.all()
+    facilities = models.Facility.objects.all()
+    s_amenities = request.GET.getlist("amenities")
+    s_facilities = request.GET.getlist("facilities")
 
-app_name = "rooms"
-urlpatterns = [path("<int:pk>", views.room_detail, name="detail")]
+    form = {
+        "city": city,
+        "s_room_type": room_type,
+        "s_country": country,
+        "price": price,
+        "guests": guests,
+        "bedrooms": bedrooms,
+        "beds": beds,
+        "baths": baths,
+        "s_amenities": s_amenities,
+        "s_facilities": s_facilities,
+        "instant": instant,
+        "superhost": superhost,
+    }
+    choices = {
+        "countries": countries,
+        "room_types": room_types,
+        "amenities": amenities,
+        "facilities": facilities,
+    }
+    filter_args = {}
+
+    if city != "Anywhere":
+        filter_args["city__startswith"] = city
+
+    if room_type != 0:
+        filter_args["room_type__pk"] = room_type
+
+    if price != 0:
+        filter_args["price__lte"] = price
+
+    if guests != 0:
+        filter_args["guest__gte"] = guests
+
+    if bedrooms != 0:
+        filter_args["bedrooms__gte"] = bedrooms
+
+    if beds != 0:
+        filter_args["beds__gte"] = beds
+
+    if baths != 0:
+        filter_args["baths__gte"] = baths
+
+    if instant:
+        filter_args["instant_book"] = True
+
+    if superhost:
+        filter_args["host__superhost"] = True
+
+    filter_args["country"] = country
+    rooms = models.Room.objects.filter(**filter_args)
+
+    if len(s_amenities) > 0:
+        for s_amenity in s_amenities:
+            rooms = rooms.filter(amenities__pk=int(s_amenity))
+
+    if len(s_facilities) > 0:
+        for s_facility in s_facilities:
+            rooms = rooms.filter(facilities__pk=int(s_facility))
+
+    return render(request, "rooms/search.html", {**form, **choices, "rooms": rooms},)
 ```
 
-**[config/urls.py]**
+```django
+{% extends "base.html" %}
 
-```python
-urlpatterns = [
-    path("", include("core.urls", namespace="core")),
-    path("rooms/", include("rooms.urls", namespace="rooms")),
-    path("admin/", admin.site.urls),
-]
+{% block page_title %}
+    Search
+{% endblock page_title %}
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+{% block search-bar %}
+{% endblock search-bar %}
+
+{% block content %}
+    <h2>search!</h2>
+    <form method="get" action="{% url 'rooms:search' %}">
+        <div>
+            <label for="city">City</label>
+            <input value="{{city}}" id="city" name="city" placeholder="Search by City" />
+        </div>
+
+        <div>
+            <label for="country">Country</label>
+            <select id="country" name="country">
+                {% for country in countries%}
+                    <option value="{{country.code}}" {% if country.code == s_country %} selected {% endif %}>{{country.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="room_type">Room_type</label>
+            <select id="room_type" name="room_type">
+                <option value="0" {% if s_room_type == 0 %} selected {%endif%}> Any kind </option>
+                {% for room_type in room_types%}
+                    <option value={{room_type.pk}} {% if s_room_type == room_type.pk %} selected {%endif%}>{{room_type.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="price">Price</label>
+            <input value="{{price}}" type="number" name="price" placeholeder="Price" />
+        </div>
+        <div>
+            <label for="guests">Guests</label>
+            <input value="{{guests}}" type="number" name="guests" placeholeder="Guests" />
+        </div>
+        <div>
+            <label for="bedrooms">Bedrooms</label>
+            <input value="{{bedrooms}}" type="number" name="bedrooms" placeholeder="Bedrooms" />
+        </div>
+        <div>
+            <label for="beds">Beds</label>
+            <input value="{{beds}}" type="number" name="beds" placeholeder="Beds" />
+        </div>
+        <div>
+            <label for="baths">Baths</label>
+            <input value="{{baths}}" type="number" name="baths" placeholeder="Baths" />
+        </div>
+        <div>
+            <label for="instant">Instant Book Only?</label>
+            <input type="checkbox" name="instant" id="instant"
+            {% if instant %}
+                checked
+            {% endif %}/>
+        </div>
+        <div>
+            <label for="superhost">By Superhost Only?</label>
+            <input type="checkbox" name="superhost" id="superhost"
+            {% if superhost %}
+                checked
+            {% endif %}/>
+        </div>
+        <div>
+            <h3>Amenities</h3>
+            <ul>
+            {% for amenity in amenities %}
+                <li>
+                    <label for="a_{{amenity.pk}}">{{amenity.name}}</label>
+                    <input id="a_{{amenity.pk}}" name="amenities" type="checkbox" value={{amenity.pk}}
+                    {% if amenity.pk|slugify in s_amenities %}
+                        checked
+                    {% endif %}/>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h3>Facilities</h3>
+            <ul>
+            {% for facility in facilities %}
+                <li>
+                    <label for="f_{{facility.pk}}">{{facility.name}}</label>
+                    <input id="f_{{facility.pk}}" name="facilities" type="checkbox" value={{facility.pk}}
+                    {% if facility.pk|slugify in s_facilities %}
+                        checked
+                    {% endif %}/>/>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        <button>Search</button>
+    </form>
+
+    <h3> Results</h3>
+    {% for room in rooms %}
+        <h3>{{room.name}}</h3>
+    {% endfor %}
+{% endblock content %}
 ```
 
----
+## > Create Searching bar Using [Forms API](https://docs.djangoproject.com/en/3.0/ref/forms/api/#module-django.forms)
 
-## > DetailViews : Class Based Views
-
-### [0. DetailView Class (Built in Django)](http://ccbv.co.uk/projects/Django/3.0/django.views.generic.detail/DetailView/)
-
-### 1. Example Code
-
-**[rooms/views.py]**
-
-```python
-from django.views.generic import ListView, DetailView
-from . import models
-
-
-class HomeView(ListView):
-    """ HomeView Definition """
-
-    model = models.Room
-    page_kwarg = "page"
-    paginate_by = 10
-    paginate_orphans = 5
-    ordering = "created"
-    context_object_name = "rooms"
-
-class RoomDetail(DetailView):
-    model = models.Room
-
-```
-
-- CBV를 사용하면 매우 간단해진다.
-- 피상적으로 간단하게 보이는 것이 오히려 개발자 관점에서는 복잡한 것!
-- 전체적인 원리를 이해하고 내 것으로 만든 뒤에 위처럼 간편한 코드를 사용하도록 하자.
