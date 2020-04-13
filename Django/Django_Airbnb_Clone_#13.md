@@ -30,8 +30,6 @@
 
 - 
 
-
-
 ```python
 def search(request):
     city = request.GET.get("city", "Anywhere")
@@ -221,5 +219,8 @@ def search(request):
 {% endblock content %}
 ```
 
+---
+
 ## > Create Searching bar Using [Forms API](https://docs.djangoproject.com/en/3.0/ref/forms/api/#module-django.forms)
 
+### 1. Bounded / Unbounded Form
