@@ -1,11 +1,11 @@
 # Airbnb-Clone #14
 
-- #13.0 Setting Up!
-- #13.1 Form and CSRF!
-- #13.2 Validating Email
-- #13.3 Validating Password
-- #13.4 Log In and Log Out
-- #13.5 Always an Easier Way
+- #14.0 Setting Up!
+- #14.1 Form and CSRF!
+- #14.2 Validating Email
+- #14.3 Validating Password
+- #14.4 Log In and Log Out
+- #14.5 Always an Easier Way
 
 ---
 
