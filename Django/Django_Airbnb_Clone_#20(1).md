@@ -10,7 +10,7 @@
 
 ---
 
-## [RTFM](https://tailwindcss.com/docs/) : 
+## [RTFM](https://tailwindcss.com/docs/) : 찾으면 다 나온다
 
 ---
 
