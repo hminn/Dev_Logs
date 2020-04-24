@@ -84,4 +84,23 @@
   {% endif %}
   ```
 
-### 3. Looping
+### 3. [Looping over the Form's fields](https://docs.djangoproject.com/en/3.0/topics/forms/#looping-over-the-form-s-fields)
+
+- 동일한 Html 형식을 갖는 Form's fields를 위한 Django의 기능!
+- 동일한 Html 형식을 복붙해서 쓰는 것이 아니라 for 문으로 돌려버린다.
+
+```django
+{% for field in form %}
+	<div class="input w-full {% if field.errors %}has_error{% endif %}">
+        {{field}}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <span class="text-red-700 font-medium text-sm">{{error}}</span>
+            {% endfor %}
+        {% endif %}
+	</div>
+{% endfor %}
+```
+
+- form에서 field를 하나씩 받아와서 동일한 html 작업을 진행한다!
+- General Errors에 대한 처리도 깔끔하게!
