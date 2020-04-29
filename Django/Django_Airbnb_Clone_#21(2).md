@@ -5,6 +5,7 @@
 - #21.7 Change Password
 - #21.8 Customizing Stuff
 - #21.9 Mixins are Awesome
+- #21.10 Great User Mixins
 
 ---
 
@@ -90,3 +91,37 @@ class UpdatePasswordView(PasswordChangeView):
         return self.request.user.get_absolute_url()
 ```
 
+---
+
+## > Mixins : CBV의 확장성을 극대화!
+
+### 1. Mixins?
+
+- 클래스에 부가적인 기능이나 정보를 추가해주기 위한 모듈을 뜻한다.
+- 몇 개를 추가해도 상관없으며 클래스에 의존적이지 않기 때문에 확장성 면에서 굉장히 자유롭다고 할 수 있다.
+
+### 2. [UserPassesTestMixin](https://docs.djangoproject.com/en/3.0/topics/auth/default/#django.contrib.auth.mixins.UserPassesTestMixin)
+
+- **AccessMixin**  
+  : 어떤 유저가 권한이 없는 페이지를 요청할 경우에 대한 예외 처리를 하게끔 해준다. (에러 메세지를 발생시킨다던지,,)
+
+  ```python
+  class LoggedOutOnlyView(UserPassesTestMixin):
+      permission_denied_error = "Page not found"
+  
+      def test_func(self):
+          return not self.request.user.is_authenticated
+  
+      def handle_no_permission(self):
+          return redirect(reverse("core:home"))
+  ```
+
+- **LoginRequiredMixin**
+  : 로그아웃 된 유저가 로그인이 필요한 페이지를 요청했을 경우에 대한 예외 처리를 하게끔 도와준다. (test_function 메소드에서 유저가 인증이 되었는지를 확인한다.)
+
+  ```python
+  class LoggedInOnlyView(LoginRequiredMixin):
+      login_url = reverse_lazy("users:login")
+  ```
+
+  
