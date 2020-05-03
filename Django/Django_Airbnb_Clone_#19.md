@@ -42,7 +42,7 @@
 
   7. 프로젝트 루트 디렉토리에 assets 폴더를 생성하고 그 안에 scss/styles.scss를 생성
 
-  8. gulpfile.js 파일을 하나 만들어 주고 다음과 같이 입력해준다.
+  8. 프로젝트 루트 디렉토리에 gulpfile.js 파일을 하나 만들어 주고 다음과 같이 입력해준다.
 
      ```js
      const gulp = require("gulp");
