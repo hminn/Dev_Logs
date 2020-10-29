@@ -179,7 +179,7 @@
 >   
 >   ```
 >
->   ![image-20201029192041983](/Users/hyeokim/Library/Application Support/typora-user-images/image-20201029192041983.png)
+>   <img width="829" alt="image-20201029192041983" src="https://user-images.githubusercontent.com/43171508/97556186-73d9eb80-1a1c-11eb-9365-bd6ff364570f.png">
 >
 >   
 
