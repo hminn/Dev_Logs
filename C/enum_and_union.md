@@ -172,8 +172,8 @@
 >       s_size.bytes.b4 = 0xAA;
 >   
 >       printf( "data : %x\n", s_size.size);
->     	printf("b1 : %p, b2 : %p, b3 : %p, b4 : %p\n", &s_size.bytes.b1, &s_size.bytes.b2, &s_size.bytes.b3, &s_size.bytes.b4);
->   		printf("size : %p\n", &s_size.size);
+>     printf("b1 : %p, b2 : %p, b3 : %p, b4 : %p\n", &s_size.bytes.b1, &s_size.bytes.b2, &s_size.bytes.b3, &s_size.bytes.b4);
+>   	printf("size : %p\n", &s_size.size);
 >       return 0;
 >   }
 >   
