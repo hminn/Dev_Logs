@@ -6,7 +6,7 @@
 
 -  Clone 작업을 진행할 디렉토리 내부(Clone 파일을 받아올 디렉토리)에서 git init
 
-##### 2. `git config core.sparseChecout true`
+##### 2. `git config core.sparseCheckout true`
 
 - 부분 체크아웃 설정을 true로 설정해준다.
 
